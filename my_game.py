@@ -76,13 +76,13 @@ class App:
         self.gameover_image = pygame.transform.smoothscale(pygame.image.load('resources/images/skull.png'), (250, 250))
         self.congratulations_image = pygame.transform.smoothscale(pygame.image.load('resources/images/award.png'), (250, 250))
         self.win_image = pygame.transform.smoothscale(pygame.image.load('resources/images/win.png'), (180, 250))
-        tip1 = self.congratulations_image = pygame.transform.smoothscale(pygame.image.load('resources/images/tip1.png'),
+        tip1 = pygame.transform.smoothscale(pygame.image.load('resources/images/tip1.png'),
                                                                          (500, 650))
-        tip2 = self.congratulations_image = pygame.transform.smoothscale(pygame.image.load('resources/images/tip2.png'),
+        tip2 = pygame.transform.smoothscale(pygame.image.load('resources/images/tip2.png'),
                                                                          (500, 650))
-        vol_on = self.congratulations_image = pygame.transform.smoothscale(pygame.image.load('resources/images/volume.png'),
+        vol_on = pygame.transform.smoothscale(pygame.image.load('resources/images/volume.png'),
                                                                          (40, 40))
-        vol_off = self.congratulations_image = pygame.transform.smoothscale(pygame.image.load('resources/images/no_volume.png'),
+        vol_off = pygame.transform.smoothscale(pygame.image.load('resources/images/no_volume.png'),
                                                                          (40, 40))
         self.tips = (tip1, tip2)
         self.volume_images = (vol_on, vol_off)
@@ -393,10 +393,6 @@ class App:
             self.win.blit(self.volume_images[0], (self.screen_size - 105, 5))
         else:
             self.win.blit(self.volume_images[1], (self.screen_size - 105, 5))
-
-
-
-
 
         #  отображение текста
         self.built_text("MENU", ((self.screen_size / 2), (self.screen_size / 6)), 60)
