@@ -305,7 +305,7 @@ class App:
                                                        self.player.y + int(self.player.height/2)), 50, 2)
         # отображение оружия
         pygame.draw.circle(self.win, (0, 0, 0), self.dot, 5, 0) if self.weapon == 1\
-            else pygame.draw.circle(self.win, (128, 0, 0), self.dot, 5, 0)
+            else pygame.draw.circle(self.win, (20, 187, 21), self.dot, 5, 0)
         # отображение пуль
         if self.bullet_list != []:
             for bullet in self.bullet_list:

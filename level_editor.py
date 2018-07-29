@@ -6,6 +6,7 @@ from os.path import isfile, join
 class LevelEditor:
 
     def __init__(self,  screen_size, shuffle, obst_size, win):
+
         self.quit = False
         self.win = win
         self.screen_size = screen_size
@@ -18,13 +19,19 @@ class LevelEditor:
         self.save_render_on = False
         self.rows_columns_count = int(self.screen_size / self.obst_size)
         self.timer = 0
+        self.shuffle = shuffle
+        self.on_init()
+
+
+    def on_init(self):
 
         for str_index in range(0, self.rows_columns_count):
             for col_index in range(0, self.rows_columns_count):
-                self.pos_list.append((col_index * self.obst_size + shuffle, str_index * self.obst_size + shuffle))
+                self.pos_list.append((col_index * self.obst_size + self.shuffle, str_index * self.obst_size + self.shuffle))
                 self.level_map.append('0')
 
     def update(self):
+
         if self.save_render_on and 1 in pygame.mouse.get_pressed() and pygame.time.get_ticks() - self.timer>1000:
             self.save_render_on = False
         mouse_x, mouse_y = pygame.mouse.get_pos()
@@ -62,13 +69,15 @@ class LevelEditor:
             self.mouse_click = False
 
     def erise(self):
-        self.level_map = [0] * self.rows_columns_count**2
+        self.level_map = ['0'] * self.rows_columns_count**2
+
 
     def save(self):
 
         maps_path = 'resources/maps/'
         onlyfiles = [f for f in listdir(maps_path) if isfile(join(maps_path, f))]
         map_name = str(int(sorted(onlyfiles)[-1].split('.')[0]) + 1)
+
         map_to_write = textwrap.wrap(''.join(self.level_map), self.rows_columns_count)
         file = open('resources/maps/{0}.txt'.format(map_name), 'w')
         file.writelines("%s\n" % line for line in map_to_write)
