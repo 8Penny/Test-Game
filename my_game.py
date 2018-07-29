@@ -35,6 +35,10 @@ class App:
         self.seconds_count = 0  # секундомер для сбора очков
         self.weapon = 1  # начальное оружие 1 - для сбора очков, -1 для стрельбы
         self.bullet_list = []  # списко пуль
+        self.heart_image = None
+        self.gameover_image = None
+        self.congratulations_image = None
+        self.win_image = None
 
         self._running = True   # флаг заппуска приложения
         self.intro = True  # сцена меню
@@ -53,6 +57,8 @@ class App:
         pygame.font.init()
         pygame.display.set_caption('FireRun')  # заголовок окна
         pygame.mouse.set_cursor(*pygame.cursors.diamond)  # форма курсора
+        pygame.mixer.music.load('resources/music/1.mp3')
+        pygame.mixer.music.play(-1, 0.0)
 
         self.generator_obstacles = Generator(self.screen_size)
         self.myfont = pygame.font.SysFont('Comic Sans MS', 30)
@@ -60,6 +66,10 @@ class App:
         self.shuffle = int((self.screen_size % self.obst_size) / 2)
         self.win = pygame.display.set_mode((self.screen_size, self.screen_size + 150))
         self.level_editor = LevelEditor(self.screen_size, self.shuffle, self.obst_size, self.win)
+        self.heart_image = pygame.transform.smoothscale(pygame.image.load('resources/images/heart.png'), (40, 40))
+        self.gameover_image = pygame.transform.smoothscale(pygame.image.load('resources/images/skull.png'), (250, 250))
+        self.congratulations_image = pygame.transform.smoothscale(pygame.image.load('resources/images/award.png'), (250, 250))
+        self.win_image = pygame.transform.smoothscale(pygame.image.load('resources/images/win.png'), (180, 250))
 
         #  предварительная генерация списка всех клеток
         for x in range(0, int(self.screen_size / self.obst_size)):
@@ -245,7 +255,7 @@ class App:
     def on_render(self):
 
         # цвет монеты ( при прикосновении, в спокойствии)
-        coin_color = (100, 100, 100) if self.timer_On else (145, 66, 98)
+        coin_color = (255, 165, 0) if self.timer_On else (255, 215, 0)
         # заполнение экрана
         self.win.fill((205, 92, 92))
         # нижнее поле с информацией
@@ -259,13 +269,14 @@ class App:
                                                      self.screen_size - 2 * self.shuffle))
         # жизни
         for live_count in range(0, self.player.lives):
-            pygame.draw.rect(self.win, (255, 255, 255), (self.screen_size - self.shuffle - 50*live_count - 40, self.screen_size, 40, 40))
+            self.win.blit(self.heart_image, (self.screen_size - self.shuffle - 50*live_count - 40, self.screen_size, 40, 40))
+
 
         # отображение смертельных клеток
         for rect in self.obst_list:
             pygame.draw.rect(self.win, (255, 0, 0), (rect[0], rect[1], self.obst_size, self.obst_size))
-        # клетка
-        self.help_render()
+
+        #self.help_render()
         # отображение монетки
         if self.coin.alive:
             pygame.gfxdraw.filled_circle(self.win, self.coin.x, self.coin.y, self.coin.radius, coin_color)
@@ -274,12 +285,12 @@ class App:
         pygame.gfxdraw.filled_circle(self.win, self.enemy.x, self.enemy.y, self.enemy.radius, (0, 0, 0))
         # отображение игрока
         pygame.draw.rect(self.win, (0, 0, 0), (self.player.x, self.player.y, self.player.width, self.player.height))
-        # отображение оружия
-        pygame.draw.circle(self.win, (0, 0, 0), self.dot, 5, 0) if self.weapon == 1\
-            else pygame.draw.circle(self.win, (255, 0, 255), self.dot, 5, 0)
         # отображение окружности прицела
         pygame.draw.circle(self.win, (255, 255, 255), (self.player.x + int(self.player.width/2),
                                                        self.player.y + int(self.player.height/2)), 50, 2)
+        # отображение оружия
+        pygame.draw.circle(self.win, (0, 0, 0), self.dot, 5, 0) if self.weapon == 1\
+            else pygame.draw.circle(self.win, (128, 0, 0), self.dot, 5, 0)
         # отображение пуль
         if self.bullet_list != []:
             for bullet in self.bullet_list:
@@ -355,9 +366,7 @@ class App:
     def gameover_screen(self):
 
         self.win.fill((188, 143, 143))
-        # загрузка изображения
-        image = pygame.transform.smoothscale(pygame.image.load('resources/images/skull.png'), (250, 250))
-        self.win.blit(image, (self.screen_size/4, self.screen_size/4))
+        self.win.blit(self.gameover_image, (self.screen_size/4, self.screen_size/4))
         self.built_text("GAME OVER", ((self.screen_size / 2), (self.screen_size / 3)), 60)
         mouse = pygame.mouse.get_pos()
         click = pygame.mouse.get_pressed()
@@ -377,8 +386,7 @@ class App:
     def level_complete(self):
 
         self.win.fill((188, 143, 143))
-        image = pygame.transform.smoothscale(pygame.image.load('resources/images/award.png'), (250, 250))
-        self.win.blit(image, (self.screen_size / 4, self.screen_size / 4))
+        self.win.blit(self.congratulations_image, (self.screen_size / 4, self.screen_size / 4))
         self.built_text("CONGRATULATIONS!", ((self.screen_size / 2), (self.screen_size / 5)), 40)
         mouse = pygame.mouse.get_pos()
         click = pygame.mouse.get_pressed()
@@ -400,8 +408,7 @@ class App:
 
     def win_screen(self):
         self.win.fill((188, 143, 143))
-        image = pygame.transform.smoothscale(pygame.image.load('resources/images/award.png'), (250, 250))
-        self.win.blit(image, (self.screen_size / 4, self.screen_size / 4))
+        self.win.blit(self.win_image, (self.screen_size / 3, self.screen_size / 4))
         self.built_text("You win!", ((self.screen_size / 2), (self.screen_size / 5)), 40)
         mouse = pygame.mouse.get_pos()
         click = pygame.mouse.get_pressed()
@@ -440,6 +447,7 @@ class App:
                         self.weapon *= -1
 
             if self.intro:
+                pygame.mouse.set_visible(1)
                 self.intro_screen()
             elif self.editor:
                 if self.level_editor.quit:
@@ -461,6 +469,11 @@ class App:
             else:
 
                 keys = pygame.key.get_pressed()
+                if keys[pygame.K_ESCAPE] and not self.intro:
+                    self.intro = True
+                    self.gameover = self.islevel_complete = self.iswin = False
+                    self.generator_obstacles.on_init()
+
                 if keys[pygame.K_a] and self.player.x > self.shuffle:
                     self.player.control(-1, 0)
                     self.aim.change_position(-1, 0)
