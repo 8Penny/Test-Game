@@ -18,7 +18,7 @@ class App:
         self.aim = Aim()  # прицел
         self.generator_obstacles = None  # генератор смертельных ячеек
         self.level_editor = None  # редактор уровня
-        self.enemy = Enemy() # враг
+        self.enemy = Enemy()  # враг
 
         self.win = None  # окно
         self._image_surf = None
@@ -39,6 +39,9 @@ class App:
         self.gameover_image = None
         self.congratulations_image = None
         self.win_image = None
+        self.volume_images = None
+        self.tips = ()  # список картинок подсказок
+        self.tip_index = 0  # индекс текущей подсказки
 
         self._running = True   # флаг заппуска приложения
         self.intro = True  # сцена меню
@@ -50,6 +53,8 @@ class App:
         self.stop_click = False  # запрет клика в меню
         self.islevel_complete = False
         self.iswin = False
+        self.istips = False
+
 
     def on_init(self):
 
@@ -59,6 +64,7 @@ class App:
         pygame.mouse.set_cursor(*pygame.cursors.diamond)  # форма курсора
         pygame.mixer.music.load('resources/music/1.mp3')
         pygame.mixer.music.play(-1, 0.0)
+        pygame.mixer.music.set_volume(0.1)
 
         self.generator_obstacles = Generator(self.screen_size)
         self.myfont = pygame.font.SysFont('Comic Sans MS', 30)
@@ -70,6 +76,16 @@ class App:
         self.gameover_image = pygame.transform.smoothscale(pygame.image.load('resources/images/skull.png'), (250, 250))
         self.congratulations_image = pygame.transform.smoothscale(pygame.image.load('resources/images/award.png'), (250, 250))
         self.win_image = pygame.transform.smoothscale(pygame.image.load('resources/images/win.png'), (180, 250))
+        tip1 = self.congratulations_image = pygame.transform.smoothscale(pygame.image.load('resources/images/tip1.png'),
+                                                                         (500, 650))
+        tip2 = self.congratulations_image = pygame.transform.smoothscale(pygame.image.load('resources/images/tip2.png'),
+                                                                         (500, 650))
+        vol_on = self.congratulations_image = pygame.transform.smoothscale(pygame.image.load('resources/images/volume.png'),
+                                                                         (40, 40))
+        vol_off = self.congratulations_image = pygame.transform.smoothscale(pygame.image.load('resources/images/no_volume.png'),
+                                                                         (40, 40))
+        self.tips = (tip1, tip2)
+        self.volume_images = (vol_on, vol_off)
 
         #  предварительная генерация списка всех клеток
         for x in range(0, int(self.screen_size / self.obst_size)):
@@ -319,6 +335,8 @@ class App:
         pygame.draw.rect(self.win, (250, 128, 114),
                          (self.screen_size / 8, self.screen_size, self.screen_size - self.screen_size * 2 / 8,
                           100))
+        pygame.draw.rect(self.win, (250, 128, 114), (self.screen_size - 50, 0, 50, 50))
+        pygame.draw.rect(self.win, (250, 128, 114), (self.screen_size - 110, 0, 50, 50))
 
         mouse = pygame.mouse.get_pos()
         click = pygame.mouse.get_pressed()
@@ -354,12 +372,38 @@ class App:
                     self.intro = False
                     self.editor = True
                     self.level_editor.quit = False
+                    self.stop_click = True
+
+            if self.screen_size - 50 < mouse[0] < self.screen_size and 0 < mouse[1] < 50:
+                    pygame.draw.rect(self.win, (255, 160, 122), (self.screen_size - 50, 0, 50, 50))
+                    if click[0] == 1:
+                        self.intro = False
+                        self.istips = True
+                        self.stop_click = True
+
+            if self.screen_size - 110 < mouse[0] < self.screen_size - 60 and 0 < mouse[1] < 50:
+                    pygame.draw.rect(self.win, (255, 160, 122), (self.screen_size - 110, 0, 50, 50))
+                    if click[0] == 1:
+                        if pygame.mixer.music.get_volume() != 0.0:
+                            pygame.mixer.music.set_volume(0.0)
+                        else:
+                            pygame.mixer.music.set_volume(0.1)
+                        self.stop_click = True
+        if pygame.mixer.music.get_volume() != 0.0:
+            self.win.blit(self.volume_images[0], (self.screen_size - 105, 5))
+        else:
+            self.win.blit(self.volume_images[1], (self.screen_size - 105, 5))
+
+
+
+
 
         #  отображение текста
         self.built_text("MENU", ((self.screen_size / 2), (self.screen_size / 6)), 60)
         self.built_text("START", (self.screen_size / 2, self.screen_size / 3 + 47))
         self.built_text("QUIT", (self.screen_size / 2, self.screen_size * 2 / 3 + 47))
         self.built_text("EDITOR", (self.screen_size / 2, self.screen_size + 47))
+        self.built_text("?", (self.screen_size - 25, 25))
 
         pygame.display.update()
 
@@ -428,6 +472,28 @@ class App:
         self.built_text("MENU", ((self.screen_size / 2), (self.screen_size * 17 / 20)), 40)
         pygame.display.update()
 
+    def tips_screen(self):
+
+        self.win.blit(self.tips[self.tip_index], (0, 0))
+        if not pygame.mouse.get_pressed()[0] and self.stop_click:
+            self.stop_click = False
+
+        if self.screen_size - 50 < pygame.mouse.get_pos()[0] < self.screen_size and 0 < pygame.mouse.get_pos()[1] < 50:
+            pygame.draw.rect(self.win, (255, 160, 122), (self.screen_size - 50, 0, 50, 50))
+            if not self.stop_click and pygame.mouse.get_pressed()[0]:
+                self.intro = True
+                self.istips = False
+                self.stop_click = True
+
+        else:
+            pygame.draw.rect(self.win, (250, 128, 114), (self.screen_size - 50, 0, 50, 50))
+            if not self.stop_click and pygame.mouse.get_pressed()[0]:
+                self.stop_click = True
+                self.tip_index = 1 if self.tip_index == 0 else 0
+        self.built_text("X", (self.screen_size - 25, 25))
+
+        pygame.display.update()
+
     def on_cleanup(self):
         pygame.quit()
 
@@ -449,6 +515,8 @@ class App:
             if self.intro:
                 pygame.mouse.set_visible(1)
                 self.intro_screen()
+            elif self.istips:
+                self.tips_screen()
             elif self.editor:
                 if self.level_editor.quit:
                     self.intro = True
@@ -466,12 +534,12 @@ class App:
             elif self.iswin:
                 pygame.mouse.set_visible(1)
                 self.win_screen()
+
             else:
 
                 keys = pygame.key.get_pressed()
                 if keys[pygame.K_ESCAPE] and not self.intro:
                     self.intro = True
-                    self.gameover = self.islevel_complete = self.iswin = False
                     self.generator_obstacles.on_init()
 
                 if keys[pygame.K_a] and self.player.x > self.shuffle:
