@@ -12,6 +12,7 @@ class Aim:
     def change_position(self, x_mult, y_mult):
         self.x += x_mult * self.player_speed
         self.y += y_mult * self.player_speed
+
     def find_position(self, direction, player_coords, radius):
         if self.degree == 360:
             self.degree = 0

@@ -32,7 +32,7 @@ class App:
         self.time_counter = 0  # секундомер для смены смертельных ячеек
         self.myfont = None  # шрифт
         self.textsurface = None
-        self.seconds_count = 0  # секундомер для сбора очков
+        self.seconds_count = None  # секундомер для сбора очков
         self.weapon = 1  # начальное оружие 1 - для сбора очков, -1 для стрельбы
         self.bullet_list = []  # списко пуль
         self.heart_image = None
@@ -54,7 +54,6 @@ class App:
         self.islevel_complete = False
         self.iswin = False
         self.istips = False
-
 
     def on_init(self):
 
@@ -107,7 +106,7 @@ class App:
         # генерация новой позиции монетки
         self.coin.new_pos(self.screen_size, self.shuffle, (self.player.x, self.player.y),
                           self.player.width, self.player.height, self.obst_list, self.obst_size)
-
+        self.seconds_count = -1
         free_pos = False
         # генерация списка свободных клеток
         self.free_rects = [item for item in self.free_rects if item not in self.obst_list]
@@ -167,7 +166,7 @@ class App:
                 if self.seconds_count == 0:  # запуск таймера
                     self.seconds_count = pygame.time.get_ticks()
                 else:
-                    if pygame.time.get_ticks() - self.seconds_count >= 300:  # если необходимое время после выстрела прошло
+                    if pygame.time.get_ticks() - self.seconds_count >= 300 or self.seconds_count == -1:  # если необходимое время после выстрела прошло
                         # создание пули
                         self.bullet_list.append(Bullet((self.dot[0], self.dot[1]), (self.player.x+self.player.width/2,
                                                                  self.player.y+self.player.height/2), self.screen_size))
@@ -447,6 +446,7 @@ class App:
         pygame.display.update()
 
     def win_screen(self):
+
         self.win.fill((188, 143, 143))
         self.win.blit(self.win_image, (self.screen_size / 3, self.screen_size / 4))
         self.built_text("You win!", ((self.screen_size / 2), (self.screen_size / 5)), 40)
@@ -463,6 +463,7 @@ class App:
                               self.screen_size - self.screen_size * 2 / 8, 60))
             if click[0] == 1:
                 self.iswin = False
+                self.generator_obstacles.on_init()
                 self.intro = True
 
         self.built_text("MENU", ((self.screen_size / 2), (self.screen_size * 17 / 20)), 40)
