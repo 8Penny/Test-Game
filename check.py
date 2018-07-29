@@ -1,4 +1,4 @@
-import math
+import math, random
 
 def player_touch_circle(p_x, p_y, width, height, radius, c_x, c_y):
     x_area = range(p_x - radius, p_x + width + radius)
@@ -25,9 +25,8 @@ def player_touch_obst(p_x, p_y, width, height, obst_list, obst_size, shuffle, re
         rects_in_player_x += 1
     if left_remainder_y > remainder_y:
         rects_in_player_y += 1
-
-
     l_rects = []
+
     for x in range(0, rects_in_player_x):
         for y in range(0, rects_in_player_y):
             l_rects.append([(int_rect_x + x) * obst_size + shuffle, (int_rect_y + y) * obst_size + shuffle])
@@ -39,4 +38,24 @@ def player_touch_obst(p_x, p_y, width, height, obst_list, obst_size, shuffle, re
             return True
     return False
 
+def first_rect(x,y,shuffle, obst_size):
+    int_rect_x = math.floor((x - shuffle) / obst_size)
+    int_rect_y = math.floor((y - shuffle) / obst_size)
+    return (int_rect_x * obst_size + shuffle, int_rect_y * obst_size + shuffle)
 
+def new_pos(screen_size, shuffle, player_pos, player_w, player_h, obst_list, obst_size, radius):
+
+    global correct, correct2
+    correct = False
+
+    while not correct:
+
+        x = shuffle + obst_size * random.randint(0, int(screen_size / obst_size) - 1)
+        y = shuffle + obst_size * random.randint(0, int(screen_size / obst_size) - 1)
+
+        check = player_touch_circle(player_pos[0], player_pos[1], player_w, player_h, radius, x, y)
+        if [x, y] not in obst_list and not check:
+            x += radius
+            y += radius
+            correct = True
+            return x, y

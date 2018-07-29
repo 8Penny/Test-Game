@@ -17,6 +17,7 @@ class LevelEditor:
         self.past_pos = None
         self.save_render_on = False
         self.rows_columns_count = int(self.screen_size / self.obst_size)
+        self.timer = 0
 
         for str_index in range(0, self.rows_columns_count):
             for col_index in range(0, self.rows_columns_count):
@@ -24,7 +25,7 @@ class LevelEditor:
                 self.level_map.append('0')
 
     def update(self):
-        if self.save_render_on and 1 in pygame.mouse.get_pressed():
+        if self.save_render_on and 1 in pygame.mouse.get_pressed() and pygame.time.get_ticks() - self.timer>1000:
             self.save_render_on = False
         mouse_x, mouse_y = pygame.mouse.get_pos()
         int_rect_x = math.floor((mouse_x - self.shuffle) / self.obst_size) * self.obst_size + self.shuffle
@@ -52,6 +53,8 @@ class LevelEditor:
                 self.mouse_click = True
                 self.save()
                 self.erise()
+                self.timer = pygame.time.get_ticks()
+
                 self.save_render_on = True
 
 

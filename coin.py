@@ -17,9 +17,9 @@ class Coin:
 
         correct = False
         while not correct:
-            for index in [0, 1]:
-                self.x = shuffle + obst_size * random.randint(0, int(screen_size / obst_size) - 1)
-                self.y = shuffle + obst_size * random.randint(0, int(screen_size / obst_size) - 1)
+
+            self.x = shuffle + obst_size * random.randint(0, int(screen_size / obst_size) - 1)
+            self.y = shuffle + obst_size * random.randint(0, int(screen_size / obst_size) - 1)
 
 
             check = player_touch_circle(player_pos[0], player_pos[1], player_w, player_h, self.radius, self.x, self.y)
