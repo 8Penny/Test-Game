@@ -7,3 +7,5 @@ My simple idea created with [pygame](https://www.pygame.org/)
 4. Clone this repository: git clone https://github.com/8Penny/test_game or click Download ZIP in right panel and extract it.
 5. Run my_game.py from the repo's directory.
 ### use <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> to move player, <kbd>↓</kbd> to choose hand or weapon, <kbd>↑</kbd> to shoot, <kbd>⟵</kbd><kbd>⟶</kbd> to move aim
+
+[![Watch the video](https://sun1-12.userapi.com/c834200/v834200621/19bbc8/ZDdQK1JMoJk.jpg)](https://youtu.be/5f5L1EKAlvY)
